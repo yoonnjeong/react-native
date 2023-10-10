@@ -8,6 +8,18 @@ import {
   ScrollView,
   ActivityIndicator,
 } from "react-native";
+import { Fontisto } from "@expo/vector-icons";
+import { LinearGradient } from "expo-linear-gradient";
+
+const icons = {
+  Clear: "day-sunny",
+  Clouds: "cloudy",
+  Rain: "rain",
+  Atmosphere: "cloudy-gusts",
+  Snow: "snow",
+  Drizzle: "day-rain",
+  Thunderstorm: "lightning",
+};
 
 const { width: SCREEN_WIDTH } = Dimensions.get("window");
 
@@ -40,7 +52,11 @@ export default function App() {
     console.log(json);
     setDays(
       json.list.filter((weather) => {
-        if (weather.dt_txt.includes("00:00:00")) {
+        if (
+          weather.dt_txt.includes("00:00:00") ||
+          weather.dt_txt.includes("06:00:00") ||
+          weather.dt_txt.includes("12:00:00")
+        ) {
           return weather;
         }
       })
@@ -52,7 +68,10 @@ export default function App() {
   }, []);
 
   return (
-    <View style={styles.container}>
+    <LinearGradient
+      colors={["#4c669f", "#3b5998", "#192f6a"]}
+      style={styles.container}
+    >
       <View style={styles.city}>
         <Text style={styles.cityName}>{city}</Text>
       </View>
@@ -63,7 +82,7 @@ export default function App() {
         contentContainerStyle={styles.weather}
       >
         {days.length === 0 ? (
-          <View style={styles.day}>
+          <View style={styles.load}>
             <ActivityIndicator style={{ marginTop: 80 }} size={"large"} />
           </View>
         ) : (
@@ -73,46 +92,71 @@ export default function App() {
                 <Text style={styles.temp}>
                   {parseFloat(day.main.temp).toFixed(1)}
                 </Text>
+                <Fontisto
+                  name={icons[day.weather[0].main]}
+                  size={80}
+                  color="white"
+                  style={{ marginBottom: 15, marginTop: 10 }}
+                />
                 <Text style={styles.desc}>{day.weather[0].main}</Text>
                 <Text style={styles.tinyText}>
                   {day.weather[0].description}
                 </Text>
+                <Text style={styles.dayText}>{day.dt_txt}</Text>
               </View>
             );
           })
         )}
       </ScrollView>
-    </View>
+    </LinearGradient>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#ffcf05",
   },
   city: {
-    flex: 1.2,
+    flex: 2,
     justifyContent: "center",
     alignItems: "center",
   },
   cityName: {
-    fontSize: 68,
+    fontSize: 60,
     fontWeight: "500",
+    color: "#fff",
   },
-  day: {
+  load: {
     width: SCREEN_WIDTH,
     alignItems: "center",
   },
+  day: {
+    width: SCREEN_WIDTH,
+    alignItems: "left",
+    paddingLeft: 30,
+  },
   temp: {
-    marginTop: 50,
-    fontSize: 178,
+    fontSize: 130,
+    color: "#fff",
   },
   desc: {
     marginTop: -20,
-    fontSize: 55,
+    fontSize: 25,
+    color: "#fff",
+    fontWeight: "600",
+    paddingLeft: 10,
+    paddingTop: 20,
   },
   tinyText: {
     fontSize: 20,
+    color: "#fff",
+    paddingLeft: 10,
+  },
+  dayText: {
+    fontSize: 23,
+    fontWeight: "600",
+    color: "#fff",
+    paddingLeft: 10,
+    marginTop: 100,
   },
 });
